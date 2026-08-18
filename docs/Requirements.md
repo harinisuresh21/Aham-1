@@ -1,4 +1,4 @@
-# AHAM --- E-Commerce Website Functional & Technical Requirements
+# AHAM Functional & Technical Requirements
 
 **Project:** AHAM\
 **Product Type:** Natural / traditional / ancient-style wellness, food,
