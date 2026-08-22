@@ -7,9 +7,9 @@ import mobileBg from '../../../assets/hero-bg-mobile.png';
 
 const Hero = () => {
   return (
-    <section aria-label="Introduction" className="relative bg-[#FDFAF5] flex flex-col w-full">
+    <section aria-label="Introduction" className="relative bg-[#F8F4EA] flex flex-col w-full">
       {/* Hero Main Area */}
-      <div className="relative w-full flex flex-col md:flex-row min-h-[580px] md:h-[clamp(560px,70vw,640px)] lg:h-[clamp(640px,50vw,760px)] md:min-h-0">
+      <div className="relative w-full flex flex-col md:flex-row h-[clamp(720px,95vh,820px)] md:h-[clamp(560px,70vw,640px)] lg:h-[clamp(640px,50vw,760px)] md:min-h-0 bg-[#FDFAF5]">
 
         {/* Background Layer — clipped */}
         <div className="absolute inset-0 bg-[#FDFAF5] overflow-hidden" style={{ zIndex: 0 }}>
@@ -55,7 +55,7 @@ const Hero = () => {
 
       {/* Statistics Panel */}
       <div
-        className="w-full px-4 lg:px-8 -mt-10 sm:-mt-12 md:-mt-8 lg:-mt-12 pb-8 lg:pb-12 max-w-7xl mx-auto"
+        className="w-full px-4 lg:px-8 -mt-10 sm:-mt-12 md:-mt-8 lg:-mt-12 max-w-[1400px] mx-auto"
         style={{ position: 'relative', zIndex: 20 }}
       >
         <HeroStats />
