@@ -1,16 +1,16 @@
 import React from 'react';
-import Hero from './Hero';
-import FeaturedProducts from './FeaturedProducts';
+import Hero from './Hero/Hero';
+import SignatureProducts from './SignatureProducts';
 import Categories from './Categories';
-import BrandStory from './BrandStory';
+import BrandStatement from './BrandStatement';
 
 const Home = () => {
   return (
     <div>
       <Hero />
-      <FeaturedProducts />
+      <BrandStatement />
+      <SignatureProducts />
       <Categories />
-      <BrandStory />
     </div>
   );
 };
