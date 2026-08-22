@@ -26,3 +26,42 @@
     @apply font-serif text-brand-primary tracking-tight;
   }
 }
+@keyframes product-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes content-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-product-enter {
+  animation: product-enter 500ms ease-out forwards;
+}
+
+.animate-content-enter {
+  animation: content-enter 500ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-product-enter,
+  .animate-content-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+

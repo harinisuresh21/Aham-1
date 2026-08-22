@@ -17,8 +17,7 @@ export const products = [
     rating: 4.8,
     reviewCount: 124,
     images: [
-      { id: "img-1", url: "https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800", is_primary: true },
-      { id: "img-2", url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=800", is_primary: false }
+      { id: "img-1", url: "/src/assets/hero-product-desktop.png", is_primary: true }
     ]
   },
   {
