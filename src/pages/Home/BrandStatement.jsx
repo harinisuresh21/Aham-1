@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Leaf, ShieldCheck, Droplet, Heart } from 'lucide-react';
-import StatementImage from '../../assets/statement-image.png';
+import { Leaf, ShieldCheck, Droplet, Heart, Star } from 'lucide-react';
+import StatementImage from '../../assets/section2-image1.png';
 
 const values = [
   { icon: Leaf, label: 'Nature Inspired' },
@@ -58,54 +57,45 @@ const BrandStatement = () => {
   return (
     <section
       ref={sectionRef}
-      className="bg-[#F8F4EA] w-full py-16 md:py-24 lg:py-[100px] overflow-hidden relative"
+      className="bg-[#F5F0E4] w-full py-[48px] md:py-[64px] lg:py-[88px] overflow-hidden relative"
     >
-      <div className="w-full max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-[clamp(32px,5vw,80px)]">
+      <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-8 lg:px-12">
 
-        <div className="flex flex-col lg:grid lg:grid-cols-[1.1fr_0.9fr] xl:grid-cols-[1fr_1fr] gap-12 lg:gap-8 items-start lg:items-stretch min-h-auto lg:min-h-[600px] xl:min-h-[680px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 xl:gap-16 items-center relative">
 
           {/* Left Column: Content */}
-          <div className="flex flex-col w-full max-w-none lg:max-w-[520px] pt-2 lg:pt-12 xl:pt-20 order-1">
-
+          <div className="flex flex-col w-full z-10 max-w-[540px]">
+            
             {/* Eyebrow */}
-            <div className="flex items-center gap-3 mb-5 lg:mb-6 opacity-0 translate-y-4 transition-all duration-700 ease-out" data-animate>
-              <span className="text-[10px] md:text-[11px] font-bold tracking-[0.15em] uppercase text-[#71845C]">
+            <div className="inline-flex self-start items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md mb-4 sm:mb-5 border border-[#243D2B]/15 shadow-sm opacity-0 translate-y-4 transition-all duration-700 ease-out" data-animate>
+              <Leaf size={12} className="text-[#71835B]" />
+              <span className="text-[#1B3022] text-[10px] sm:text-[11px] font-bold tracking-widest uppercase">
                 THE AHAM PHILOSOPHY
               </span>
-              <div className="h-[1px] w-8 md:w-12 bg-[#243D2B]/20"></div>
-              <Leaf size={14} className="text-[#71845C]" />
             </div>
 
             {/* Heading */}
-            <h2 className="font-serif leading-[1.0] text-[#243D2B] mb-5 lg:mb-8 tracking-[-0.01em] opacity-0 translate-y-4 transition-all duration-700 delay-100 ease-out text-[clamp(42px,11vw,56px)] md:text-[clamp(52px,6vw,68px)] lg:text-[72px]" data-animate>
-              <span className="block mb-1">Rooted in Nature.</span>
-              <span className="block text-[#71845C]">Guided by Tradition.</span>
+            <h2 className="text-[clamp(36px,9vw,48px)] md:text-[clamp(42px,5vw,56px)] lg:text-[clamp(48px,4.5vw,60px)] font-serif leading-[1.05] mb-4 lg:mb-5 tracking-tight text-[#1B3022] font-semibold opacity-0 translate-y-4 transition-all duration-700 delay-100 ease-out" data-animate>
+              <span className="block drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Rooted in Nature.</span>
+              <span className="block text-[#47623F] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Guided by Tradition.</span>
             </h2>
 
             {/* Description */}
-            <p className="text-[14.5px] md:text-[15px] lg:text-[16px] leading-[1.65] text-[#243D2B]/85 max-w-[440px] lg:max-w-full mb-8 lg:mb-10 font-sans opacity-0 translate-y-4 transition-all duration-700 delay-200 ease-out" data-animate>
+            <p className="text-[14px] sm:text-[15px] lg:text-[16px] text-[#1E2D24] font-medium mb-6 lg:mb-8 w-full leading-[1.6] font-sans drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)] opacity-0 translate-y-4 transition-all duration-700 delay-200 ease-out" data-animate>
               At AHAM, we believe wellness begins with what comes from the earth. We bring together carefully sourced ingredients, traditional knowledge and thoughtful formulations to create simple, meaningful products for everyday living.
             </p>
 
-            {/* CTA */}
-            <div className="opacity-0 translate-y-4 transition-all duration-700 delay-300 ease-out" data-animate>
-              <Link
-                to="/about"
-                className="inline-flex items-center gap-2 text-[14.5px] lg:text-[16px] font-semibold text-[#243D2B] hover:text-[#71845C] transition-colors group border-b-2 border-[#243D2B]/20 hover:border-[#71845C]/50 pb-1"
-              >
-                Discover Our Story
-                <ArrowRight size={16} className="group-hover:translate-x-1.5 transition-transform duration-300" />
-              </Link>
-            </div>
-
-            {/* Desktop Brand Values - Hidden on Mobile */}
-            <div className="hidden lg:flex flex-row items-center gap-8 xl:gap-10 mt-auto pt-16 opacity-0 translate-y-4 transition-all duration-700 delay-400 ease-out" data-animate>
+            {/* Brand Values (Pill Grid/Wrap) */}
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2.5 sm:gap-3 w-full opacity-0 translate-y-4 transition-all duration-700 delay-300 ease-out" data-animate>
               {values.map((v, i) => (
-                <div key={i} className="flex flex-col items-center gap-3">
-                  <div className="w-12 h-12 rounded-full border border-[#243D2B]/15 flex items-center justify-center bg-transparent text-[#243D2B]">
-                    <v.icon size={20} strokeWidth={1.5} />
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-[#243D2B]/10 shadow-[0_2px_8px_rgba(0,0,0,0.03)] shrink-0"
+                >
+                  <div className="w-6 h-6 shrink-0 rounded-full bg-[#71835B]/15 flex items-center justify-center text-[#243D2B]">
+                    <v.icon size={13} strokeWidth={2} />
                   </div>
-                  <span className="text-[#243D2B] text-[12px] font-medium text-center leading-tight max-w-[80px]">
+                  <span className="text-[11px] sm:text-[12px] font-semibold text-[#1B3022] leading-tight whitespace-nowrap">
                     {v.label}
                   </span>
                 </div>
@@ -115,28 +105,37 @@ const BrandStatement = () => {
           </div>
 
           {/* Right Column: Image Composition */}
-          <div className="relative w-full order-2 mt-8 lg:mt-0 flex items-center justify-center">
+          <div className="w-full flex items-center justify-center relative z-0 mt-6 lg:mt-0">
+            <div className="relative w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[500px] h-auto mx-auto opacity-0 transition-all duration-[1200ms] ease-out scale-[1.03]" data-animate-img>
+              
+              {/* Soft blurred radial gradient glow behind */}
+              <div className="absolute inset-0 bg-[#71835B]/25 blur-[80px] rounded-full w-[90%] h-[90%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-20"></div>
 
-            {/* Main Botanical Collage */}
-            <div className="w-full max-w-[100%] md:max-w-[520px] lg:max-w-[620px] h-auto flex items-center justify-center opacity-0 transition-all duration-[1200ms] ease-out scale-[1.03]" data-animate-img>
-              <img src={StatementImage} alt="AHAM Botanical Collage" className="w-full h-auto object-contain" />
+              {/* Layered Accent / Texture Box */}
+              <div className="absolute -inset-3 sm:-inset-4 bg-[#E8E0CE] border border-[#243D2B]/5 rounded-[2rem] rotate-[3deg] shadow-inner -z-10 transition-transform duration-700 hover:rotate-[5deg]"></div>
+              
+              {/* Secondary Layered Accent */}
+              <div className="absolute -inset-1.5 bg-white/40 border border-white/60 rounded-[2rem] -rotate-[2deg] backdrop-blur-sm -z-10"></div>
+
+              {/* Main Image with drop shadow and rounded corners */}
+              <img 
+                src={StatementImage} 
+                alt="AHAM Botanical Collage" 
+                className="w-full h-auto object-cover rounded-[1.75rem] sm:rounded-[2rem] drop-shadow-[0_20px_40px_rgba(0,0,0,0.12)] z-10 relative" 
+              />
+
+              {/* Floating Stat Card overlapping edge */}
+              <div className="absolute -bottom-4 -left-3 sm:-left-6 bg-white/95 backdrop-blur-md rounded-[1.25rem] shadow-[0_8px_24px_rgb(0,0,0,0.06)] py-2.5 px-4 sm:py-3 sm:px-5 border border-white/70 flex items-center gap-3 z-20">
+                <div className="w-9 h-9 shrink-0 rounded-full bg-[#71835B]/15 flex items-center justify-center text-[#243D2B]">
+                  <Star size={16} strokeWidth={1.5} fill="currentColor" className="text-[#243D2B]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-[14px] sm:text-[16px] font-bold text-[#1B3022] leading-tight">4.9/5 Rating</p>
+                  <p className="text-[11px] sm:text-[12px] text-[#1E2D24]/70 font-medium">Loved by thousands</p>
+                </div>
+              </div>
+
             </div>
-
-          </div>
-
-          {/* Mobile Brand Values - Understated inline list */}
-          <div className="lg:hidden order-3 w-full mt-4 flex flex-wrap justify-center items-center gap-x-2 gap-y-2 opacity-0 translate-y-4 transition-all duration-700 delay-400 ease-out" data-animate>
-            {values.map((v, i) => (
-              <React.Fragment key={i}>
-                <span className="text-[#243D2B]/85 text-[11px] sm:text-[12px] font-semibold tracking-wide uppercase flex items-center gap-1.5">
-                  <v.icon size={11} strokeWidth={2} className="text-[#71845C]" />
-                  {v.label}
-                </span>
-                {i < values.length - 1 && (
-                  <span className="text-[#243D2B]/30 text-[10px] mx-1">•</span>
-                )}
-              </React.Fragment>
-            ))}
           </div>
 
         </div>

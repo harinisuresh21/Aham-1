@@ -29,11 +29,6 @@ const Header = () => {
         {/* CENTER: Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center gap-6 lg:gap-8">
           <Link to="/" className="text-[13px] lg:text-[14px] font-semibold text-[#1B3022] hover:text-[#71835B] transition-colors">Home</Link>
-          <Link to="/products" className="text-[13px] lg:text-[14px] font-medium text-[#1B3022]/80 hover:text-[#1B3022] transition-colors">Shop</Link>
-          <Link to="/about" className="text-[13px] lg:text-[14px] font-medium text-[#1B3022]/80 hover:text-[#1B3022] transition-colors">Our Story</Link>
-          <Link to="/how-it-works" className="text-[13px] lg:text-[14px] font-medium text-[#1B3022]/80 hover:text-[#1B3022] transition-colors">How It Works</Link>
-          <Link to="/testimonials" className="text-[13px] lg:text-[14px] font-medium text-[#1B3022]/80 hover:text-[#1B3022] transition-colors">Testimonials</Link>
-          <Link to="/faq" className="text-[13px] lg:text-[14px] font-medium text-[#1B3022]/80 hover:text-[#1B3022] transition-colors">FAQ</Link>
         </nav>
 
         {/* RIGHT: Actions */}
