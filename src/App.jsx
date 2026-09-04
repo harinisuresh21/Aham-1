@@ -16,10 +16,19 @@ import OrderSuccess from './pages/OrderSuccess';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Dashboard from './admin/Dashboard';
+import AdminLogin from './admin/pages/Login';
+import ProductList from './admin/pages/Products/ProductList';
+import CategoryList from './admin/pages/Categories/CategoryList';
+import OrderList from './admin/pages/Orders/OrderList';
+import CustomerList from './admin/pages/Customers/CustomerList';
+import CouponList from './admin/pages/Coupons/CouponList';
+import AuditLogs from './admin/pages/AuditLogs';
 
 import { ToastProvider } from './context/ToastContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { AdminAuthProvider } from './admin/context/AdminAuthContext';
+import AdminProtectedRoute from './admin/components/AdminProtectedRoute';
 
 // Mock views until actual pages are built
 const PlaceholderPage = ({ title }) => (
@@ -34,39 +43,48 @@ function App() {
     <ToastProvider>
       <CartProvider>
         <WishlistProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="products" element={<Products />} />
-                <Route path="products/:slug" element={<ProductDetails />} />
-                <Route path="product/:id" element={<ProductDetails />} />
-                <Route path="categories/:slug" element={<PlaceholderPage title="Category Details" />} />
+          <AdminAuthProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="products" element={<Products />} />
+                  <Route path="products/:slug" element={<ProductDetails />} />
+                  <Route path="product/:id" element={<ProductDetails />} />
+                  <Route path="categories/:slug" element={<PlaceholderPage title="Category Details" />} />
 
-                <Route path="cart" element={<Cart />} />
-                <Route path="wishlist" element={<Wishlist />} />
-                <Route path="checkout" element={<Checkout />} />
-                <Route path="order-success" element={<OrderSuccess />} />
+                  <Route path="cart" element={<Cart />} />
+                  <Route path="wishlist" element={<Wishlist />} />
+                  <Route path="checkout" element={<Checkout />} />
+                  <Route path="order-success" element={<OrderSuccess />} />
 
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="orders/:id" element={<TrackOrder />} />
-                <Route path="track-order" element={<TrackOrder />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="orders/:id" element={<TrackOrder />} />
+                  <Route path="track-order" element={<TrackOrder />} />
 
-                <Route path="about" element={<About />} />
-                {/* <Route path="contact" element={<Contact />} /> */}
-                <Route path="faq" element={<PlaceholderPage title="FAQ" />} />
-              </Route>
+                  <Route path="about" element={<About />} />
+                  {/* <Route path="contact" element={<Contact />} /> */}
+                  <Route path="faq" element={<PlaceholderPage title="FAQ" />} />
+                </Route>
 
-              <Route path="/admin">
-                <Route index element={<Dashboard />} />
-                <Route path="products" element={<PlaceholderPage title="Admin Products" />} />
-                <Route path="orders" element={<PlaceholderPage title="Admin Orders" />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                
+                <Route path="/admin" element={<AdminProtectedRoute />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="products" element={<ProductList />} />
+                  <Route path="categories" element={<CategoryList />} />
+                  <Route path="orders" element={<OrderList />} />
+                  <Route path="coupons" element={<CouponList />} />
+                  <Route path="users" element={<CustomerList />} />
+                  <Route path="audit-logs" element={<AuditLogs />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </AdminAuthProvider>
         </WishlistProvider>
       </CartProvider>
     </ToastProvider>
