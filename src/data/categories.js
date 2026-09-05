@@ -11,7 +11,7 @@ export const categories = [
     id: "cat-2",
     name: "Traditional Oils",
     slug: "traditional-oils",
-    description: "Cold-pressed, unrefined oils made using ancient techniques.",
+    description: "Cold-pressed, unrefined oils made using traditional techniques.",
     image_url: "https://images.unsplash.com/photo-1474625121024-7595bfbc57ac?auto=format&fit=crop&q=80&w=800",
     is_active: true
   },
@@ -19,7 +19,7 @@ export const categories = [
     id: "cat-3",
     name: "Natural Food",
     slug: "natural-food",
-    description: "Wholesome, unadulterated food products for daily nutrition.",
+    description: "Wholesome, unadulterated food products for everyday nutrition.",
     image_url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=800",
     is_active: true
   },
