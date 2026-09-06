@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
 import cartRoutes from './routes/cartRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import adminAuthRoutes from './routes/adminAuthRoutes.js';
 import adminProductRoutes from './routes/adminProductRoutes.js';
 import adminCategoryRoutes from './routes/adminCategoryRoutes.js';
@@ -32,6 +33,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/cart', cartRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/products', adminProductRoutes);
 app.use('/api/admin/categories', adminCategoryRoutes);

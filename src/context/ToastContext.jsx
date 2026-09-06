@@ -11,7 +11,9 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const addToast = useCallback(
-    ({ type = 'success', message, title, icon, duration = 3000 }) => {
+    (options, typeParam = 'success') => {
+      const toastOpts = typeof options === 'string' ? { message: options, type: typeParam } : options;
+      const { type = 'success', message, title, icon, duration = 3000 } = toastOpts || {};
       const id = 'toast_' + Math.random().toString(36).substring(2, 9) + Date.now();
       const newToast = { id, type, message, title, icon, duration };
 
@@ -30,6 +32,7 @@ export const ToastProvider = ({ children }) => {
 
   // Convenient helper functions
   const toast = {
+    addToast: (msg, type) => addToast(msg, type),
     success: (message, title, icon) => addToast({ type: 'success', message, title, icon }),
     error: (message, title, icon) => addToast({ type: 'error', message, title, icon }),
     info: (message, title, icon) => addToast({ type: 'info', message, title, icon }),

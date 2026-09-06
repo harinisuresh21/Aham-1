@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/layout/Container';
 import Input from '../components/ui/Input';
@@ -27,65 +27,46 @@ import {
 import { useToast } from '../context/ToastContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { orderService } from '../services/orderService';
 import { products } from '../data/products';
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState('orders'); // 'dashboard' | 'orders' | 'addresses' | 'settings'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'orders' | 'addresses' | 'settings'
   const [orderSearch, setOrderSearch] = useState('');
 
   const toast = useToast();
   const { wishlistCount } = useWishlist();
   const { cartCount } = useCart();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   // User State
   const [userProfile, setUserProfile] = useState({
-    name: 'Priya Sundaram',
-    email: 'priya.sundaram@example.com',
-    phone: '+91 98765 43210',
-    joinedDate: 'January 2025',
+    name: user?.name || 'AHAM Customer',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    joinedDate: 'Recent Member',
   });
 
-  // Orders State
-  const [ordersList] = useState([
-    {
-      id: 'AHM-10023',
-      date: 'Aug 15, 2026',
-      status: 'OUT_FOR_DELIVERY',
-      statusLabel: 'Out for Delivery',
-      paymentMethod: 'UPI / Google Pay',
-      total: 849,
-      itemCount: 2,
-      items: [
-        { product: products[0], qty: 1, price: 399 },
-        { product: products[1], qty: 1, price: 450 },
-      ],
-    },
-    {
-      id: 'AHM-10018',
-      date: 'Jul 02, 2026',
-      status: 'DELIVERED',
-      statusLabel: 'Delivered',
-      paymentMethod: 'Cash on Delivery',
-      total: 540,
-      itemCount: 1,
-      items: [
-        { product: products[1], qty: 1, price: 450 },
-      ],
-    },
-    {
-      id: 'AHM-10009',
-      date: 'May 18, 2026',
-      status: 'DELIVERED',
-      statusLabel: 'Delivered',
-      paymentMethod: 'Credit Card',
-      total: 1049,
-      itemCount: 3,
-      items: [
-        { product: products[0], qty: 1, price: 399 },
-        { product: products[2], qty: 1, price: 650 },
-      ],
-    },
-  ]);
+  // Orders State (Dynamic per user account)
+  const [ordersList, setOrdersList] = useState([]);
+
+  useEffect(() => {
+    if (user?.email) {
+      setUserProfile({
+        name: user.name || 'AHAM Customer',
+        email: user.email,
+        phone: user.phone || '',
+        joinedDate: 'Active Member',
+      });
+      const customerOrders = orderService.getUserOrders(user.email);
+      setOrdersList(customerOrders);
+    } else {
+      setOrdersList([]);
+    }
+  }, [user]);
 
   // Saved Addresses State
   const [addresses, setAddresses] = useState([
@@ -348,7 +329,10 @@ const Profile = () => {
               <div className="p-4 border-t border-brand-border bg-brand-cream-light/60">
                 <button
                   type="button"
-                  onClick={() => toast.info('You have safely signed out of your session.', 'Signed Out')}
+                  onClick={() => {
+                    logout();
+                    navigate('/login');
+                  }}
                   className="w-full flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-red-600 hover:text-red-800 hover:bg-red-50 py-2.5 rounded transition-colors"
                 >
                   <LogOut size={15} /> Sign Out

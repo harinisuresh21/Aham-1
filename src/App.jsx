@@ -24,7 +24,10 @@ import CustomerList from './admin/pages/Customers/CustomerList';
 import CouponList from './admin/pages/Coupons/CouponList';
 import AuditLogs from './admin/pages/AuditLogs';
 
+import ProtectedRoute from './components/auth/ProtectedRoute';
+
 import { ToastProvider } from './context/ToastContext';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AdminAuthProvider } from './admin/context/AdminAuthContext';
@@ -41,10 +44,11 @@ const PlaceholderPage = ({ title }) => (
 function App() {
   return (
     <ToastProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <AdminAuthProvider>
-            <BrowserRouter>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <AdminAuthProvider>
+              <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
@@ -55,15 +59,17 @@ function App() {
 
                   <Route path="cart" element={<Cart />} />
                   <Route path="wishlist" element={<Wishlist />} />
-                  <Route path="checkout" element={<Checkout />} />
-                  <Route path="order-success" element={<OrderSuccess />} />
+                  
+                  {/* Customer Protected Routes */}
+                  <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+                  <Route path="order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                  <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                  <Route path="orders/:id" element={<ProtectedRoute><TrackOrder /></ProtectedRoute>} />
+                  <Route path="track-order" element={<ProtectedRoute><TrackOrder /></ProtectedRoute>} />
 
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="orders/:id" element={<TrackOrder />} />
-                  <Route path="track-order" element={<TrackOrder />} />
 
                   <Route path="about" element={<About />} />
                   {/* <Route path="contact" element={<Contact />} /> */}
@@ -87,7 +93,8 @@ function App() {
           </AdminAuthProvider>
         </WishlistProvider>
       </CartProvider>
-    </ToastProvider>
+    </AuthProvider>
+  </ToastProvider>
   );
 }
 
