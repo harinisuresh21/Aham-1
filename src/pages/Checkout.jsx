@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
+import { orderService } from '../services/orderService';
 
 const FREE_SHIPPING_THRESHOLD = 999;
 const STANDARD_SHIPPING_FEE = 50;
@@ -28,18 +30,24 @@ const COD_FEE = 40;
 
 const Checkout = () => {
   const { cartItems, subtotal, clearCart } = useCart();
+  const { user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState(null);
 
+  // Derive initial first/last name from user.name if available
+  const nameParts = (user?.name || 'Priya Sundaram').split(' ');
+  const userFirstName = nameParts[0] || '';
+  const userLastName = nameParts.slice(1).join(' ') || '';
+
   // Left Column: Shipping & Contact Form State
   const [formData, setFormData] = useState({
-    firstName: 'Priya',
-    lastName: 'Sundaram',
-    email: 'priya.sundaram@example.com',
-    phone: '+91 98765 43210',
+    firstName: userFirstName,
+    lastName: userLastName,
+    email: user?.email || 'priya.sundaram@example.com',
+    phone: user?.phone || '+91 98765 43210',
     street: 'No. 42, 3rd Cross, 100ft Road, Indiranagar',
     landmark: 'Near Defence Colony Ground',
     city: 'Bengaluru',
@@ -54,7 +62,7 @@ const Checkout = () => {
   const [upiId, setUpiId] = useState('');
   const [cardDetails, setCardDetails] = useState({
     cardNumber: '',
-    cardName: 'Priya Sundaram',
+    cardName: `${userFirstName} ${userLastName}`.trim(),
     expiry: '',
     cvv: '',
   });
@@ -90,8 +98,11 @@ const Checkout = () => {
       const generatedOrderId = `AHM-${Math.floor(100000 + Math.random() * 900000)}`;
 
       const orderData = {
+        id: generatedOrderId,
         orderId: generatedOrderId,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: 'PROCESSING',
+        statusLabel: 'Processing Order',
         recipientName: `${formData.firstName} ${formData.lastName}`.trim(),
         recipientPhone: formData.phone,
         recipientEmail: formData.email,
@@ -106,8 +117,12 @@ const Checkout = () => {
         subtotal,
         shipping,
         codHandlingFee,
+        itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0),
         items: [...cartItems],
       };
+
+      // Save order associated with user account
+      orderService.saveOrder(user?.email || formData.email, orderData);
 
       setConfirmedOrder(orderData);
       setOrderPlaced(true);

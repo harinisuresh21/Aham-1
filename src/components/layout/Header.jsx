@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, Heart, Search, Package } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Heart, Search, Package, LogOut } from 'lucide-react';
 import logoImg from '../../assets/aham-logo.png';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const Header = () => {
 
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const containerClass = isHome
     ? "fixed top-4 sm:top-5 lg:top-8 left-0 right-0 z-50 w-full px-4 sm:px-6 lg:px-[clamp(32px,5vw,80px)] max-w-[1400px] mx-auto pointer-events-none"
@@ -74,13 +76,25 @@ const Header = () => {
             </Link>
 
             {/* Profile / Sign In */}
-            <Link
-              to="/profile"
-              className="hidden sm:flex text-[13px] lg:text-[14px] font-semibold text-[#1B3022] hover:text-[#71835B] transition-colors items-center gap-1.5"
-            >
-              <User size={16} />
-              <span className="hidden lg:inline">Account</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/profile"
+                className="hidden sm:flex text-[13px] lg:text-[14px] font-semibold text-[#1B3022] hover:text-[#71835B] transition-colors items-center gap-1.5 bg-white/40 px-3 py-1.5 rounded-full border border-white/50"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#243D2B] text-white flex items-center justify-center text-xs font-bold">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <span className="hidden lg:inline max-w-[100px] truncate">{user?.name || 'Account'}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden sm:flex text-[13px] lg:text-[14px] font-semibold text-[#1B3022] hover:text-[#71835B] transition-colors items-center gap-1.5"
+              >
+                <User size={16} />
+                <span className="hidden lg:inline">Sign In</span>
+              </Link>
+            )}
 
             {/* Cart Icon with Dynamic Badge */}
             <Link
@@ -183,13 +197,35 @@ const Header = () => {
                 >
                   <Package size={16} /> My Orders
                 </Link>
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-brand-charcoal hover:bg-brand-cream/50 rounded"
-                >
-                  <User size={16} /> Account
-                </Link>
+
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-brand-charcoal hover:bg-brand-cream/50 rounded"
+                    >
+                      <User size={16} /> My Profile ({user?.name})
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full text-left flex items-center gap-2 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded"
+                    >
+                      <LogOut size={16} /> Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-brand-charcoal hover:bg-brand-cream/50 rounded"
+                  >
+                    <User size={16} /> Sign In / Register
+                  </Link>
+                )}
               </div>
             </nav>
 
