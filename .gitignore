@@ -1,4 +1,4 @@
-# Dependencies
+# Dependencie
 node_modules/
 
 # Build output
@@ -11,6 +11,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.venv
 
 # Logs
 *.log

@@ -61,7 +61,7 @@ const SignatureProducts = () => {
   const activeProduct = products[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col justify-center min-h-[auto] py-12 lg:py-0 lg:h-[600px] xl:h-[640px]">
+    <section className="relative w-full overflow-hidden flex flex-col justify-center min-h-[auto] py-12 lg:py-16 lg:min-h-[600px] xl:min-h-[640px]">
       
       {/* Background Images with subtle animation on product change */}
       <div className="absolute inset-0 z-0">

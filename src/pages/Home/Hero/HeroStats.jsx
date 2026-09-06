@@ -10,7 +10,7 @@ const stats = [
 
 const HeroStats = () => {
   return (
-    <div className="bg-white/95 backdrop-blur-md rounded-[1.25rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] py-4 px-5 md:px-8 mx-auto w-full lg:w-[84%] max-w-[1140px] border border-white/60">
+    <div className="bg-white/95 backdrop-blur-md rounded-[1.25rem] shadow-[0_4px_20px_rgb(0,0,0,0.03)] py-3 sm:py-3.5 px-5 md:px-8 mx-auto w-full lg:w-[84%] max-w-[1140px] border border-white/60">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-5 gap-x-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
