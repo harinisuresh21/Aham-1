@@ -16,12 +16,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MOCK_CATEGORIES = [
-  { _id: 'cat-1', name: 'Turmeric', slug: 'turmeric', description: 'Single origin high curcumin turmeric powders', isActive: true, displayOrder: 1 },
-  { _id: 'cat-2', name: 'Traditional Oils', slug: 'traditional-oils', description: 'Mara Chekku cold pressed organic oils', isActive: true, displayOrder: 2 },
-  { _id: 'cat-3', name: 'Natural Food', slug: 'natural-food', description: 'Raw forest honey and traditional organic foods', isActive: true, displayOrder: 3 },
-  { _id: 'cat-4', name: 'Spices', slug: 'spices', description: 'Handpicked organic whole and ground spices', isActive: true, displayOrder: 4 },
-];
+
 
 const CategoryList = () => {
   const { token, admin, logout } = useAdminAuth();
@@ -45,19 +40,20 @@ const CategoryList = () => {
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch('http://localhost:5000/api/admin/categories', {
+      const res = await fetch(`${API_URL}/api/admin/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok && data.success && data.categories.length > 0) {
+      if (res.ok && data.success && Array.isArray(data.categories)) {
         setCategories(data.categories);
       } else {
-        setCategories(MOCK_CATEGORIES);
+        setCategories([]);
       }
     } catch (err) {
-      console.warn('Relying on fallback categories data:', err.message);
-      setCategories(MOCK_CATEGORIES);
+      console.warn('API error fetching categories:', err.message);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -98,10 +94,11 @@ const CategoryList = () => {
     setSaving(true);
     setError('');
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
       const url = editingCategory
-        ? `http://localhost:5000/api/admin/categories/${editingCategory._id}`
-        : 'http://localhost:5000/api/admin/categories';
+        ? `${API_URL}/api/admin/categories/${editingCategory._id}`
+        : `${API_URL}/api/admin/categories`;
       const method = editingCategory ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -137,14 +134,17 @@ const CategoryList = () => {
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Delete category '${name}'?`)) return;
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/categories/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCategories(prev => prev.filter(c => c._id !== id));
+      if (res.ok) {
+        setCategories(prev => prev.filter(c => c._id !== id));
+      }
     } catch (err) {
-      setCategories(prev => prev.filter(c => c._id !== id));
+      console.error('Delete category error:', err);
     }
   };
 

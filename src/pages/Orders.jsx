@@ -11,12 +11,15 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
+    let isMounted = true;
     if (user?.email) {
-      const userOrders = orderService.getUserOrders(user.email);
-      setOrders(userOrders);
+      orderService.fetchUserOrders(user.email).then((userOrders) => {
+        if (isMounted) setOrders(userOrders);
+      });
     } else {
       setOrders([]);
     }
+    return () => { isMounted = false; };
   }, [user?.email]);
 
   const getStatusBadgeClass = (status) => {

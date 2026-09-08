@@ -43,8 +43,9 @@ const OrderDetail = ({ order, isOpen, onClose, onOrderUpdated }) => {
     setError('');
     setSuccessMsg('');
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${order._id || order.id}/status`, {
+      const res = await fetch(`${API_URL}/api/admin/orders/${order._id || order.id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -75,8 +76,9 @@ const OrderDetail = ({ order, isOpen, onClose, onOrderUpdated }) => {
     setError('');
     setSuccessMsg('');
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${order._id || order.id}/fulfillment`, {
+      const res = await fetch(`${API_URL}/api/admin/orders/${order._id || order.id}/fulfillment`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -108,8 +110,9 @@ const OrderDetail = ({ order, isOpen, onClose, onOrderUpdated }) => {
     if (!newAdminNote.trim()) return;
     setAddingNote(true);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${order._id || order.id}/notes`, {
+      const res = await fetch(`${API_URL}/api/admin/orders/${order._id || order.id}/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

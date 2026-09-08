@@ -101,9 +101,10 @@ const ProductForm = ({ product, isOpen, onClose, onSaved }) => {
           : [],
       };
 
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const url = product
-        ? `http://localhost:5000/api/admin/products/${product._id || product.id}`
-        : 'http://localhost:5000/api/admin/products';
+        ? `${API_URL}/api/admin/products/${product._id || product.id}`
+        : `${API_URL}/api/admin/products`;
 
       const method = product ? 'PUT' : 'POST';
 

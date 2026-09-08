@@ -17,35 +17,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MOCK_CUSTOMERS = [
-  {
-    _id: "cust-1",
-    name: "Ananya Ramesh",
-    email: "ananya@example.com",
-    phone: "+91 9840123456",
-    ordersCount: 5,
-    totalSpent: 4250,
-    lastOrderDate: "2026-08-20T10:30:00.000Z",
-  },
-  {
-    _id: "cust-2",
-    name: "Karthik Subramanian",
-    email: "karthik@example.com",
-    phone: "+91 9444112233",
-    ordersCount: 12,
-    totalSpent: 8900,
-    lastOrderDate: "2026-08-19T14:15:00.000Z",
-  },
-  {
-    _id: "cust-3",
-    name: "Priya Lakshmi",
-    email: "priya@example.com",
-    phone: "+91 9789012345",
-    ordersCount: 2,
-    totalSpent: 1300,
-    lastOrderDate: "2026-08-18T09:00:00.000Z",
-  },
-];
+
 
 const CustomerList = () => {
   const { token, admin, logout } = useAdminAuth();
@@ -63,27 +35,20 @@ const CustomerList = () => {
       const params = new URLSearchParams();
       if (search) params.append('search', search);
 
-      const res = await fetch(`http://localhost:5000/api/admin/customers?${params.toString()}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/customers?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
 
-      if (res.ok && data.success && data.customers.length > 0) {
+      if (res.ok && data.success && Array.isArray(data.customers)) {
         setCustomers(data.customers);
       } else {
-        let filtered = [...MOCK_CUSTOMERS];
-        if (search) {
-          filtered = filtered.filter(
-            (c) =>
-              c.name.toLowerCase().includes(search.toLowerCase()) ||
-              c.email.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-        setCustomers(filtered);
+        setCustomers([]);
       }
     } catch (err) {
-      console.warn('API error, relying on local mock customers data:', err.message);
-      setCustomers(MOCK_CUSTOMERS);
+      console.warn('API error fetching customers:', err.message);
+      setCustomers([]);
     } finally {
       setLoading(false);
     }

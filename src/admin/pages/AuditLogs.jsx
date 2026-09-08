@@ -11,34 +11,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MOCK_AUDITS = [
-  {
-    _id: "aud-1",
-    adminEmail: "admin@aham.com",
-    action: "ADMIN_LOGIN",
-    resource: "AUTH",
-    ipAddress: "127.0.0.1",
-    createdAt: "2026-08-20T10:00:00.000Z",
-  },
-  {
-    _id: "aud-2",
-    adminEmail: "admin@aham.com",
-    action: "STOCK_ADJUSTMENT",
-    resource: "PRODUCTS",
-    details: { name: "Cold-Pressed Sesame Oil", oldStock: 5, newStock: 8 },
-    ipAddress: "127.0.0.1",
-    createdAt: "2026-08-20T10:15:00.000Z",
-  },
-  {
-    _id: "aud-3",
-    adminEmail: "admin@aham.com",
-    action: "ORDER_STATUS_UPDATE",
-    resource: "ORDERS",
-    details: { orderNumber: "AHM-10022", newStatus: "PROCESSING" },
-    ipAddress: "127.0.0.1",
-    createdAt: "2026-08-19T15:00:00.000Z",
-  },
-];
+
 
 const AuditLogs = () => {
   const { token, admin, logout } = useAdminAuth();
@@ -48,19 +21,20 @@ const AuditLogs = () => {
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch('http://localhost:5000/api/admin/audit-logs', {
+      const res = await fetch(`${API_URL}/api/admin/audit-logs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok && data.success && data.logs.length > 0) {
+      if (res.ok && data.success && Array.isArray(data.logs)) {
         setLogs(data.logs);
       } else {
-        setLogs(MOCK_AUDITS);
+        setLogs([]);
       }
     } catch (err) {
-      console.warn('Using local audit log catalog:', err.message);
-      setLogs(MOCK_AUDITS);
+      console.warn('API error fetching audit logs:', err.message);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
