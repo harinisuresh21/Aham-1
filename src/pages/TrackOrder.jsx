@@ -69,13 +69,29 @@ const TrackOrder = () => {
   const [orderIdInput, setOrderIdInput] = useState(id || '');
   const [phoneInput, setPhoneInput] = useState(user?.phone || '');
   const [activeOrderId, setActiveOrderId] = useState(id || '');
+  const [liveOrder, setLiveOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const userOrder = activeOrderId ? orderService.getOrderById(user?.email, activeOrderId) : null;
+  useEffect(() => {
+    let isMounted = true;
+    if (activeOrderId) {
+      setLoading(true);
+      orderService.fetchOrderByNumber(activeOrderId, user?.email).then((res) => {
+        if (isMounted) {
+          setLiveOrder(res);
+          setLoading(false);
+        }
+      });
+    } else {
+      setLiveOrder(null);
+    }
+    return () => { isMounted = false; };
+  }, [activeOrderId, user?.email]);
+
   const sampleOrder = mockOrders[activeOrderId];
+  const order = liveOrder || sampleOrder || null;
 
-  const order = userOrder || sampleOrder || null;
-
-  const handleTrackSubmit = (e) => {
+  const handleTrackSubmit = async (e) => {
     e.preventDefault();
     if (!orderIdInput.trim()) {
       toast.error('Please enter a valid Order ID (e.g. AHM-10023)', 'Order ID Required');
@@ -84,12 +100,16 @@ const TrackOrder = () => {
 
     const cleanId = orderIdInput.trim().toUpperCase();
     setActiveOrderId(cleanId);
-    
-    const found = orderService.getOrderById(user?.email, cleanId) || mockOrders[cleanId];
-    if (found) {
-      toast.success(`Tracking details loaded for Order #${cleanId}`, 'Tracking Updated');
+    setLoading(true);
+
+    const res = await orderService.fetchOrderByNumber(cleanId, user?.email);
+    setLiveOrder(res);
+    setLoading(false);
+
+    if (res) {
+      toast.success(`Live tracking details loaded for Order #${cleanId}`, 'Tracking Updated');
     } else {
-      toast.info(`No order found matching #${cleanId} under your account.`, 'Tracking Search');
+      toast.info(`No order found matching #${cleanId}.`, 'Tracking Search');
     }
   };
 

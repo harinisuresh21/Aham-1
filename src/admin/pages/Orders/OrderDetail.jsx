@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
+import { orderService } from '../../../services/orderService';
 
 const OrderDetail = ({ order, isOpen, onClose, onOrderUpdated }) => {
   const { token } = useAdminAuth();
@@ -60,10 +61,12 @@ const OrderDetail = ({ order, isOpen, onClose, onOrderUpdated }) => {
       }
 
       setSuccessMsg(`Order status updated to ${selectedStatus}`);
+      orderService.updateOrderStatusLocal(order.orderNumber || order.id, selectedStatus, order.customer?.email, order.fulfillment);
       onOrderUpdated(data.order);
     } catch (err) {
       setError(err.message);
       // Fallback local update
+      orderService.updateOrderStatusLocal(order.orderNumber || order.id, selectedStatus, order.customer?.email, order.fulfillment);
       onOrderUpdated({ ...order, orderStatus: selectedStatus });
     } finally {
       setUpdatingStatus(false);
