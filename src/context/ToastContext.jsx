@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle2, AlertCircle, Info, Trash2, X, ShoppingBag, Heart } from 'lucide-react';
+import { CheckCircle2, Info, Trash2, X, ShoppingBag, Heart } from 'lucide-react';
 
 const ToastContext = createContext(null);
 
@@ -78,7 +78,8 @@ export const ToastProvider = ({ children }) => {
 
       {/* Floating Toast Notification Container (Bottom-Right) */}
       <div
-        className="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"
+        id="toast-container"
+        className="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0 print:hidden"
         aria-live="polite"
       >
         {toasts.map((t) => {

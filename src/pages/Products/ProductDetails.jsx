@@ -27,7 +27,8 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import Input from '../../components/ui/Input';
 import ProductCard from '../../components/product/ProductCard';
-import { ProductAPI, ReviewAPI } from '../../services/api';
+import turmericEssenceImg from '../../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../../assets/forest-honey.jpeg';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import { useToast } from '../../context/ToastContext';
@@ -104,7 +105,7 @@ const ProductDetails = () => {
     if (!product) return [];
     if (product.images && product.images.length > 0) return product.images;
     if (product.image) return [{ id: 'img-1', url: product.image, is_primary: true }];
-    return [{ id: 'img-default', url: 'https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800', is_primary: true }];
+    return [{ id: 'img-default', url: product?.category_id === 'cat-3' || product?.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg, is_primary: true }];
   }, [product]);
 
   const activeImageUrl = imagesList[selectedImageIndex]?.url || imagesList[0]?.url;
@@ -254,24 +255,44 @@ const ProductDetails = () => {
                     key={img.id || idx}
                     type="button"
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`w-18 h-18 sm:w-20 sm:h-20 border-2 rounded overflow-hidden flex-shrink-0 bg-brand-cream transition-all ${
+                    className={`w-18 h-18 sm:w-20 sm:h-20 border-2 rounded-xl overflow-hidden flex-shrink-0 bg-brand-cream transition-all ${
                       selectedImageIndex === idx
                         ? 'border-brand-primary ring-2 ring-brand-primary/20 scale-105'
                         : 'border-brand-border opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
+                    <img 
+                      src={img.url} 
+                      alt="" 
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = product?.category_id === 'cat-3' || product?.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg;
+                      }}
+                      className={`object-cover w-full h-full rounded-xl ${
+                        typeof img.url === 'string' && (img.url.includes('.png') || img.url.includes('hero-product'))
+                          ? '!object-contain p-1'
+                          : ''
+                      }`}
+                    />
                   </button>
                 ))}
               </div>
             )}
 
             {/* Main Stage Image */}
-            <div className="relative flex-1 aspect-square bg-brand-cream border border-brand-border overflow-hidden rounded group">
+            <div className="relative flex-1 aspect-square bg-brand-cream border border-brand-border overflow-hidden rounded-xl group flex items-center justify-center">
               <img
                 src={activeImageUrl}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = product?.category_id === 'cat-3' || product?.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg;
+                }}
+                className={`object-cover w-full h-full rounded-xl ${
+                  typeof activeImageUrl === 'string' && (activeImageUrl.includes('.png') || activeImageUrl.includes('hero-product'))
+                    ? '!object-contain p-6'
+                    : ''
+                } transition-transform duration-500 group-hover:scale-105`}
               />
 
               {/* Discount / Sale Badge */}

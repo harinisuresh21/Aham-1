@@ -1,10 +1,13 @@
+import turmericEssenceImg from '../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../assets/forest-honey.jpeg';
+
 export const categories = [
   {
     id: "cat-1",
     name: "Turmeric",
     slug: "turmeric",
     description: "Pure, naturally sourced turmeric with high curcumin content.",
-    image_url: "https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800",
+    image_url: turmericEssenceImg,
     is_active: true
   },
   {
@@ -19,8 +22,8 @@ export const categories = [
     id: "cat-3",
     name: "Natural Food",
     slug: "natural-food",
-    description: "Wholesome, unadulterated food products for everyday nutrition.",
-    image_url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=800",
+    description: "Wholesome, unadulterated food products for daily nutrition.",
+    image_url: forestHoneyImg,
     is_active: true
   },
   {

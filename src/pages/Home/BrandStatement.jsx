@@ -58,7 +58,7 @@ const BrandStatement = () => {
   return (
     <section
       ref={sectionRef}
-      className="bg-[#F5F0E4] w-full py-[48px] md:py-[64px] lg:py-[88px] overflow-hidden relative"
+      className="bg-[#FDFAF5] w-full py-[48px] md:py-[64px] lg:py-[88px] overflow-hidden relative"
     >
       <Container>
 

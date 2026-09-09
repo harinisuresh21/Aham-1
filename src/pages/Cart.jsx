@@ -21,6 +21,8 @@ import Badge from '../components/ui/Badge';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
+import turmericEssenceImg from '../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../assets/forest-honey.jpeg';
 
 const FREE_SHIPPING_THRESHOLD = 999;
 const STANDARD_SHIPPING_FEE = 50;
@@ -187,7 +189,7 @@ const Cart = () => {
                 <div className="divide-y divide-brand-border">
                   {cartItems.map((item) => {
                     const productId = item.productId || item.id;
-                    const itemImg = item.image || item.images?.[0]?.url || 'https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800';
+                    const itemImg = item.image || item.images?.[0]?.url || (item.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg);
 
                     return (
                       <div
@@ -198,12 +200,16 @@ const Cart = () => {
                         <div className="col-span-1 sm:col-span-6 flex gap-4 items-center">
                           <Link
                             to={item.slug ? `/products/${item.slug}` : '/products'}
-                            className="w-20 h-20 bg-brand-cream border border-brand-border flex-shrink-0 overflow-hidden rounded group block"
+                            className="w-20 h-20 bg-brand-cream border border-brand-border flex-shrink-0 overflow-hidden rounded-xl group block"
                           >
                             <img
                               src={itemImg}
                               alt={item.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = item.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg;
+                              }}
+                              className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-300"
                             />
                           </Link>
 

@@ -6,10 +6,10 @@ import BrandStatement from './BrandStatement';
 
 const Home = () => {
   return (
-    <div>
+    <div className="bg-[#FDFAF5] w-full min-h-screen overflow-x-hidden">
       <Hero />
-      <BrandStatement />
       <SignatureProducts />
+      <BrandStatement />
       <Categories />
     </div>
   );

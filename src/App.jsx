@@ -15,6 +15,7 @@ import TrackOrder from './pages/TrackOrder';
 import OrderSuccess from './pages/OrderSuccess';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Invoice from './pages/Invoice';
 import Dashboard from './admin/Dashboard';
 import AdminLogin from './admin/pages/Login';
 import ProductList from './admin/pages/Products/ProductList';
@@ -70,9 +71,13 @@ function App() {
 
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />
+                  <Route path="orders/:id/invoice" element={<Invoice />} />
+                  <Route path="invoice/:id" element={<Invoice />} />
+                  <Route path="invoice" element={<Invoice />} />
 
                   <Route path="about" element={<About />} />
-                  {/* <Route path="contact" element={<Contact />} /> */}
+                  <Route path="our-story" element={<About />} />
+                  <Route path="contact" element={<Contact />} />
                   <Route path="faq" element={<PlaceholderPage title="FAQ" />} />
                 </Route>
 

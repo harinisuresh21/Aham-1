@@ -18,10 +18,13 @@ import {
   ShieldCheck,
   Sparkles,
   Phone,
-  Mail
+  Mail,
+  FileText
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { products } from '../data/products';
+import turmericEssenceImg from '../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../assets/forest-honey.jpeg';
 
 const OrderSuccess = () => {
   const location = useLocation();
@@ -49,7 +52,7 @@ const OrderSuccess = () => {
         price: 399,
         quantity: 1,
         weight: '250g',
-        image: 'https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800',
+        image: turmericEssenceImg,
         slug: 'aham-natural-turmeric-powder'
       },
       {
@@ -160,13 +163,14 @@ const OrderSuccess = () => {
                 </Button>
               </Link>
 
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center justify-center gap-2 border border-brand-border bg-white px-6 py-3.5 text-sm font-semibold text-brand-charcoal hover:bg-brand-cream transition-colors rounded"
-              >
-                <Download size={16} /> Download Invoice
-              </button>
+              <Link to={`/orders/${orderData.orderId}/invoice`}>
+                <button
+                  type="button"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-brand-border bg-white px-6 py-3.5 text-sm font-semibold text-brand-charcoal hover:bg-brand-cream hover:border-brand-primary transition-colors rounded cursor-pointer shadow-2xs"
+                >
+                  <FileText size={16} className="text-brand-primary" /> View & Print Invoice
+                </button>
+              </Link>
 
               <Link to="/products">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto">
@@ -185,13 +189,21 @@ const OrderSuccess = () => {
             {/* Items List */}
             <div className="divide-y divide-brand-border">
               {orderData.items.map((item, index) => {
-                const itemImg = item.image || item.images?.[0]?.url || 'https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800';
+                const itemImg = item.image || item.images?.[0]?.url || (item.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg);
 
                 return (
                   <div key={index} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-brand-cream border border-brand-border flex-shrink-0 rounded overflow-hidden relative">
-                        <img src={itemImg} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="w-16 h-16 bg-brand-cream border border-brand-border flex-shrink-0 rounded-xl overflow-hidden relative">
+                        <img
+                          src={itemImg}
+                          alt={item.name}
+                          className="object-cover w-full h-full rounded-xl"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = item.slug?.includes('honey') ? forestHoneyImg : turmericEssenceImg;
+                          }}
+                        />
                         <span className="absolute -top-1 -right-1 bg-brand-primary text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                           {item.quantity || 1}
                         </span>

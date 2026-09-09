@@ -17,6 +17,11 @@ import {
   Compass
 } from 'lucide-react';
 
+import turmericEssenceImg from '../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../assets/forest-honey.jpeg';
+
+const DEFAULT_AYURVEDIC_FALLBACK = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+
 const philosophyCards = [
   {
     icon: Droplet,
@@ -34,7 +39,7 @@ const philosophyCards = [
     description:
       'Grown in the mineral-rich soils of Erode and Salem, our turmeric is slow shade-dried and stone-ground, yielding an exceptional 5.2%+ natural curcumin potency with intact essential oils.',
     badge: '5.2%+ Curcumin',
-    image: 'https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800',
+    image: turmericEssenceImg,
   },
   {
     icon: Sprout,
@@ -43,7 +48,7 @@ const philosophyCards = [
     description:
       'Unpasteurized, unprocessed, and non-irradiated honey gathered from deep Nilgiri forest blooms. Rich in natural bee pollen, enzymes, and deep floral notes.',
     badge: 'Raw & Active',
-    image: 'https://images.unsplash.com/photo-1587049352851-8d4e89134a5d?auto=format&fit=crop&q=80&w=800',
+    image: forestHoneyImg,
   },
   {
     icon: Compass,
@@ -139,6 +144,10 @@ const About = () => {
                 <img
                   src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=1200"
                   alt="Traditional Ayurvedic roots and preparation"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = DEFAULT_AYURVEDIC_FALLBACK;
+                  }}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                 />
               </div>
@@ -237,11 +246,15 @@ const About = () => {
                     </p>
                   </div>
 
-                  <div className="aspect-[16/9] bg-brand-cream overflow-hidden border border-brand-border/60 mt-auto">
+                  <div className="w-full h-48 overflow-hidden rounded-xl bg-brand-cream border border-brand-border/60 mt-auto flex items-center justify-center">
                     <img
                       src={card.image}
                       alt={card.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = DEFAULT_AYURVEDIC_FALLBACK;
+                      }}
+                      className="object-cover w-full h-full rounded-xl group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 </div>

@@ -65,3 +65,17 @@
   }
 }
 
+@media print {
+  @page {
+    margin: 10mm;
+    size: A4;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+  nav, header, footer, .print\:hidden, #toast-container, [aria-live="polite"], .toast, .animate-toast {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+

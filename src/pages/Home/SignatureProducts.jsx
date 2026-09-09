@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ProductAPI } from '../../services/api';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
@@ -7,6 +8,7 @@ import mobileBg from '../../assets/section2-background-mobile.png';
 import product1Img from '../../assets/section2-product1.png';
 import product2Img from '../../assets/section2-product2.png';
 import product3Img from '../../assets/section2-product3.png';
+import forestHoneyImg from '../../assets/forest-honey.jpeg';
 
 // Visual tuning per product to ensure they occupy the same perceived space in the fixed stage.
 const PRODUCT_CONFIG = {
@@ -17,6 +19,10 @@ const PRODUCT_CONFIG = {
   'prod-2': {
     image: product2Img,
     style: { transform: 'scale(1.0) translateY(2%)' }
+  },
+  'prod-3': {
+    image: forestHoneyImg,
+    style: { transform: 'scale(0.95) translateY(0%)' }
   },
   'prod-4': { 
     image: product3Img,
@@ -55,15 +61,15 @@ const SignatureProducts = () => {
   };
 
   if (products.length === 0) {
-    return <section className="py-24 lg:py-32 min-h-[560px] bg-[#F8F4EA]"></section>;
+    return <section className="py-24 lg:py-32 min-h-[560px] bg-[#FDFAF5]"></section>;
   }
 
   const activeProduct = products[currentIndex];
 
   return (
-    <section className="relative w-full overflow-hidden flex flex-col justify-center min-h-[auto] py-12 lg:py-16 lg:min-h-[600px] xl:min-h-[640px]">
+    <section className="relative w-full overflow-hidden flex flex-col justify-center min-h-[auto] py-12 lg:py-0 lg:h-[600px] xl:h-[640px] bg-[#FDFAF5]">
       
-      {/* Background Images with subtle animation on product change */}
+      {/* Background Images with seamless gradient blending at top and bottom */}
       <div className="absolute inset-0 z-0">
         <img 
           key={`desktop-${currentIndex}`}
@@ -77,6 +83,12 @@ const SignatureProducts = () => {
           className="block lg:hidden w-full h-full object-cover object-bottom" 
           alt="AHAM Background" 
         />
+
+        {/* Top Seamless Blend Feathering (Hero / BrandStatement to SignatureProducts) */}
+        <div className="absolute top-0 left-0 right-0 h-36 sm:h-48 bg-gradient-to-b from-[#FDFAF5] via-[#FDFAF5]/90 to-transparent pointer-events-none" />
+
+        {/* Bottom Seamless Blend Feathering (SignatureProducts to BrandStatement / Categories) */}
+        <div className="absolute bottom-0 left-0 right-0 h-36 sm:h-48 bg-gradient-to-t from-[#FDFAF5] via-[#FDFAF5]/90 to-transparent pointer-events-none" />
       </div>
       
       {/* Content Container - Reduced max-width and adjusted padding to pull content away from edges/leaves */}
@@ -103,15 +115,28 @@ const SignatureProducts = () => {
             </p>
           </div>
           
-          {/* CENTER COLUMN: Fixed Product Stage */}
+          {/* CENTER COLUMN: Fixed Product Stage with Soft Mist Reveal */}
           <div className="flex justify-center items-end shrink-0 relative w-full max-w-[320px] h-[320px] sm:max-w-[420px] sm:h-[420px] lg:max-w-[440px] lg:h-[460px] xl:max-w-[500px] xl:h-[500px] z-10">
-            <div className="absolute inset-0 flex items-end justify-center">
-               <img 
-                 src={activeProduct.displayImage} 
-                 alt={activeProduct.name}
-                 className="w-full h-full object-contain"
-                 style={activeProduct.customStyle}
-               />
+            <div className="absolute inset-0 flex items-end justify-center overflow-visible">
+              <motion.img 
+                key={activeProduct.id}
+                src={activeProduct.displayImage} 
+                alt={activeProduct.name}
+                initial={{ opacity: 0, filter: 'blur(8px)', scale: 0.96 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full h-full object-contain"
+                style={activeProduct.customStyle}
+              />
+
+              {/* Soft organic mist puff on reveal */}
+              <motion.div
+                key={`mist-${activeProduct.id}`}
+                initial={{ opacity: 0.7, scale: 0.9, y: 5 }}
+                animate={{ opacity: 0, scale: 1.15, y: -10 }}
+                transition={{ duration: 0.85, ease: 'easeOut' }}
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-20 bg-gradient-to-t from-white/75 via-white/40 to-transparent blur-md pointer-events-none"
+              />
             </div>
           </div>
           

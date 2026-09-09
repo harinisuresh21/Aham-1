@@ -1,3 +1,7 @@
+import turmericBottleImg from '../assets/hero-product-desktop.png';
+import turmericEssenceImg from '../assets/turmeric-essence.jpeg';
+import forestHoneyImg from '../assets/forest-honey.jpeg';
+
 export const products = [
   {
     id: "prod-1",
@@ -19,8 +23,8 @@ export const products = [
     reviewCount: 124,
     tags: ["100% Organic", "FSSAI Certified", "Single Origin", "No Preservatives"],
     images: [
-      { id: "img-1", url: "https://images.unsplash.com/photo-1615486171448-4fd325a8ee58?auto=format&fit=crop&q=80&w=800", is_primary: true },
-      { id: "img-1-sub", url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=800", is_primary: false }
+      { id: "img-1", url: turmericEssenceImg, is_primary: true },
+      { id: "img-1-bottle", url: turmericBottleImg, is_primary: false }
     ]
   },
   {
@@ -66,7 +70,7 @@ export const products = [
     reviewCount: 56,
     tags: ["100% Organic", "FSSAI Certified", "No Preservatives", "Single Origin"],
     images: [
-      { id: "img-3", url: "https://images.unsplash.com/photo-1587049352851-8d4e89134a5d?auto=format&fit=crop&q=80&w=800", is_primary: true }
+      { id: "img-3", url: forestHoneyImg, is_primary: true }
     ]
   },
   {

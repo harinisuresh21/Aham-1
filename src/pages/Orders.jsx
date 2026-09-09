@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/layout/Container';
 import Button from '../components/ui/Button';
-import { Package, ChevronRight, Truck, Clock } from 'lucide-react';
+import { Package, ChevronRight, Truck, Clock, FileText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
 
@@ -100,6 +100,12 @@ const Orders = () => {
                         <span className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border ${getStatusBadgeClass(order.status)}`}>
                           {order.statusLabel || order.status || 'Processing'}
                         </span>
+                        <Link
+                          to={`/orders/${order.id || order.orderId}/invoice`}
+                          className="inline-flex items-center gap-1.5 bg-white text-brand-primary border border-brand-border hover:bg-brand-cream hover:border-brand-primary px-3 py-2 text-xs font-medium transition-colors rounded-sm shadow-2xs"
+                        >
+                          <FileText size={13} /> Invoice
+                        </Link>
                         <Link
                           to={`/orders/${order.id || order.orderId}`}
                           className="inline-flex items-center gap-1.5 bg-brand-primary text-white hover:bg-opacity-90 px-4 py-2 text-xs font-medium transition-colors rounded-sm shadow-sm"
