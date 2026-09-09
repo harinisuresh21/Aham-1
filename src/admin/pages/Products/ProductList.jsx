@@ -88,36 +88,21 @@ const ProductList = () => {
       if (stockFilter) params.append('stockFilter', stockFilter);
       if (selectedStatus) params.append('status', selectedStatus);
 
-      const res = await fetch(`http://localhost:5000/api/admin/products?${params.toString()}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/products?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
 
-      if (res.ok && data.success && data.products.length > 0) {
+      if (res.ok && data.success && Array.isArray(data.products)) {
         setProducts(data.products);
       } else {
-        // Fallback filter over mock products if API returns empty
-        let filtered = [...MOCK_PRODUCTS];
-        if (search) {
-          filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase()));
-        }
-        if (selectedCategory) {
-          filtered = filtered.filter(p => p.category_name === selectedCategory);
-        }
-        if (stockFilter === 'low_stock') {
-          filtered = filtered.filter(p => p.stock_quantity > 0 && p.stock_quantity <= 15);
-        } else if (stockFilter === 'out_of_stock') {
-          filtered = filtered.filter(p => p.stock_quantity === 0);
-        }
-        if (selectedStatus) {
-          filtered = filtered.filter(p => p.status === selectedStatus);
-        }
-        setProducts(filtered);
+        setProducts([]);
       }
     } catch (err) {
-      console.warn('API error, relying on local state catalog:', err.message);
-      setProducts(MOCK_PRODUCTS);
+      console.warn('API error fetching products:', err.message);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -132,8 +117,9 @@ const ProductList = () => {
     if (!stockModalProduct) return;
     setStockUpdating(true);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/products/${stockModalProduct._id}/stock`, {
+      const res = await fetch(`${API_URL}/api/admin/products/${stockModalProduct._id}/stock`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -144,15 +130,10 @@ const ProductList = () => {
 
       if (res.ok) {
         setProducts(prev => prev.map(p => p._id === stockModalProduct._id ? { ...p, stock_quantity: Number(newStockValue) } : p));
-      } else {
-        // Local update fallback
-        setProducts(prev => prev.map(p => p._id === stockModalProduct._id ? { ...p, stock_quantity: Number(newStockValue) } : p));
       }
       setStockModalProduct(null);
     } catch (err) {
       console.error('Stock patch error:', err);
-      setProducts(prev => prev.map(p => p._id === stockModalProduct._id ? { ...p, stock_quantity: Number(newStockValue) } : p));
-      setStockModalProduct(null);
     } finally {
       setStockUpdating(false);
     }
@@ -162,15 +143,17 @@ const ProductList = () => {
   const handleArchive = async (id, name) => {
     if (!window.confirm(`Are you sure you want to archive product '${name}'?`)) return;
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/products/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProducts(prev => prev.filter(p => p._id !== id));
+      if (res.ok) {
+        setProducts(prev => prev.filter(p => p._id !== id));
+      }
     } catch (err) {
       console.error('Archive error:', err);
-      setProducts(prev => prev.filter(p => p._id !== id));
     }
   };
 

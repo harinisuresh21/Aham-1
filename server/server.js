@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
+import { seedDatabase } from './seed.js';
 import cartRoutes from './routes/cartRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import adminAuthRoutes from './routes/adminAuthRoutes.js';
@@ -14,14 +15,16 @@ import adminCouponRoutes from './routes/adminCouponRoutes.js';
 import adminAnalyticsRoutes from './routes/adminAnalyticsRoutes.js';
 import adminAuditLogRoutes from './routes/adminAuditLogRoutes.js';
 
+import orderRoutes from './routes/orderRoutes.js';
+
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB & seed initial data
+connectDB().then(() => seedDatabase());
 
 // Middleware
 app.use(cors({
@@ -32,6 +35,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+app.use('/api/orders', orderRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);

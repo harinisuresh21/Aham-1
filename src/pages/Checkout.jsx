@@ -93,11 +93,74 @@ const Checkout = () => {
 
     setIsSubmitting(true);
 
-    // Simulate payment authorization
-    setTimeout(() => {
-      const generatedOrderId = `AHM-${Math.floor(100000 + Math.random() * 900000)}`;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-      const orderData = {
+    const orderPayload = {
+      customer: {
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: user?.email || formData.email,
+        phone: formData.phone,
+      },
+      shippingAddress: {
+        street: `${formData.street}${formData.landmark ? ', ' + formData.landmark : ''}`,
+        city: formData.city,
+        state: formData.state || 'Tamil Nadu',
+        pincode: formData.pincode,
+        country: formData.country || 'India',
+      },
+      items: cartItems.map((item) => ({
+        _id: item._id || item.id,
+        name: item.name,
+        sku: item.sku || '',
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image || item.imageUrl || (Array.isArray(item.images) ? item.images[0]?.url : '') || '',
+      })),
+      subtotal,
+      shippingFee: shipping,
+      discount: 0,
+      totalAmount: total,
+      paymentMethod,
+    };
+
+    let createdOrderData = null;
+
+    try {
+      const res = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.order) {
+        const o = data.order;
+        createdOrderData = {
+          id: o.orderNumber,
+          orderId: o.orderNumber,
+          date: new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          status: o.orderStatus,
+          statusLabel: 'Order Confirmed & Processing',
+          recipientName: o.customer.name,
+          recipientPhone: o.customer.phone,
+          recipientEmail: o.customer.email,
+          deliveryAddress: `${o.shippingAddress.street}, ${o.shippingAddress.city}, ${o.shippingAddress.state} - ${o.shippingAddress.pincode}`,
+          paymentMethod: o.paymentMethod,
+          total: o.totalAmount,
+          subtotal: o.subtotal,
+          shipping: o.shippingFee,
+          codHandlingFee,
+          itemCount: o.items.reduce((acc, item) => acc + item.quantity, 0),
+          items: o.items,
+        };
+      }
+    } catch (err) {
+      console.warn('Backend order post failed, storing locally:', err.message);
+    }
+
+    if (!createdOrderData) {
+      const generatedOrderId = `AHM-${Math.floor(100000 + Math.random() * 900000)}`;
+      createdOrderData = {
         id: generatedOrderId,
         orderId: generatedOrderId,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -107,12 +170,7 @@ const Checkout = () => {
         recipientPhone: formData.phone,
         recipientEmail: formData.email,
         deliveryAddress: `${formData.street}, ${formData.landmark ? formData.landmark + ', ' : ''}${formData.city}, ${formData.state} - ${formData.pincode}`,
-        paymentMethod:
-          paymentMethod === 'upi'
-            ? 'Google Pay / PhonePe / UPI'
-            : paymentMethod === 'card'
-            ? 'Credit / Debit Card'
-            : 'Cash on Delivery (COD)',
+        paymentMethod,
         total,
         subtotal,
         shipping,
@@ -120,17 +178,17 @@ const Checkout = () => {
         itemCount: cartItems.reduce((acc, item) => acc + item.quantity, 0),
         items: [...cartItems],
       };
+    }
 
-      // Save order associated with user account
-      orderService.saveOrder(user?.email || formData.email, orderData);
+    // Save order associated with user account locally as well
+    orderService.saveOrder(user?.email || formData.email, createdOrderData);
 
-      setConfirmedOrder(orderData);
-      setOrderPlaced(true);
-      clearCart();
-      setIsSubmitting(false);
-      toast.success('Your order has been placed successfully!', 'Order Confirmed');
-      navigate('/order-success', { state: { order: orderData } });
-    }, 800);
+    setConfirmedOrder(createdOrderData);
+    setOrderPlaced(true);
+    clearCart();
+    setIsSubmitting(false);
+    toast.success('Your order has been placed successfully!', 'Order Confirmed');
+    navigate('/order-success', { state: { order: createdOrderData } });
   };
 
   // If cart is empty and order not placed yet

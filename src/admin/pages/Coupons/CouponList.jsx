@@ -19,38 +19,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MOCK_COUPONS = [
-  {
-    _id: "cpn-1",
-    code: "WELCOME10",
-    discountType: "PERCENTAGE",
-    discountValue: 10,
-    minOrderAmount: 499,
-    usageLimit: 500,
-    usedCount: 42,
-    isActive: true,
-  },
-  {
-    _id: "cpn-2",
-    code: "ORGANICFLAT100",
-    discountType: "FLAT",
-    discountValue: 100,
-    minOrderAmount: 999,
-    usageLimit: 200,
-    usedCount: 15,
-    isActive: true,
-  },
-  {
-    _id: "cpn-3",
-    code: "FESTIVE20",
-    discountType: "PERCENTAGE",
-    discountValue: 20,
-    minOrderAmount: 1499,
-    usageLimit: 100,
-    usedCount: 100,
-    isActive: false,
-  },
-];
+
 
 const CouponList = () => {
   const { token, admin, logout } = useAdminAuth();
@@ -76,19 +45,20 @@ const CouponList = () => {
 
   const fetchCoupons = useCallback(async () => {
     setLoading(true);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch('http://localhost:5000/api/admin/coupons', {
+      const res = await fetch(`${API_URL}/api/admin/coupons`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok && data.success && data.coupons.length > 0) {
+      if (res.ok && data.success && Array.isArray(data.coupons)) {
         setCoupons(data.coupons);
       } else {
-        setCoupons(MOCK_COUPONS);
+        setCoupons([]);
       }
     } catch (err) {
-      console.warn('API error, relying on mock coupons catalog:', err.message);
-      setCoupons(MOCK_COUPONS);
+      console.warn('API error fetching coupons:', err.message);
+      setCoupons([]);
     } finally {
       setLoading(false);
     }
@@ -131,10 +101,11 @@ const CouponList = () => {
     setSaving(true);
     setError('');
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
       const url = editingCoupon
-        ? `http://localhost:5000/api/admin/coupons/${editingCoupon._id}`
-        : 'http://localhost:5000/api/admin/coupons';
+        ? `${API_URL}/api/admin/coupons/${editingCoupon._id}`
+        : `${API_URL}/api/admin/coupons`;
 
       const method = editingCoupon ? 'PUT' : 'POST';
 
@@ -177,14 +148,17 @@ const CouponList = () => {
   const handleDelete = async (id, code) => {
     if (!window.confirm(`Delete coupon '${code}'?`)) return;
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      await fetch(`http://localhost:5000/api/admin/coupons/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/coupons/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCoupons((prev) => prev.filter((c) => c._id !== id));
+      if (res.ok) {
+        setCoupons((prev) => prev.filter((c) => c._id !== id));
+      }
     } catch (err) {
-      setCoupons((prev) => prev.filter((c) => c._id !== id));
+      console.error('Delete coupon error:', err);
     }
   };
 

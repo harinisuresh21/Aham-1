@@ -17,35 +17,84 @@ const Dashboard = () => {
   const { admin, token, logout } = useAdminAuth();
 
   const [metrics, setMetrics] = useState({
-    totalOrders: 1240,
-    totalRevenue: 450000,
-    totalCustomers: 890,
-    lowStockCount: 12,
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalCustomers: 0,
+    lowStockCount: 0,
   });
+  const [recentOrders, setRecentOrders] = useState([]);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const getLocalOrders = () => {
+    const list = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('aham_user_orders_')) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) list.push(...parsed);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading local orders fallback:', e);
+    }
+    return list.map((o) => ({
+      _id: o.id || o.orderId,
+      orderNumber: o.orderId || o.id,
+      customer: { name: o.recipientName || 'Customer', email: o.recipientEmail || 'guest@example.com' },
+      createdAt: o.date ? new Date(o.date).toISOString() : new Date().toISOString(),
+      totalAmount: o.total || 0,
+      orderStatus: o.status || 'PROCESSING',
+    }));
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
-      if (!token) return;
-      try {
-        const res = await fetch('http://localhost:5000/api/admin/analytics/dashboard', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok && data.success && data.metrics) {
-          setMetrics((prev) => ({
-            ...prev,
-            totalOrders: data.metrics.totalOrders || prev.totalOrders,
-            totalRevenue: data.metrics.totalRevenue || prev.totalRevenue,
-            lowStockCount: data.metrics.lowStockCount || prev.lowStockCount,
-          }));
+      let loadedFromApi = false;
+      if (token) {
+        try {
+          const res = await fetch(`${API_URL}/api/admin/analytics/dashboard`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          if (res.ok && data.success && data.metrics) {
+            loadedFromApi = true;
+            const apiOrders = data.recentOrders || [];
+            const localFallbackOrders = getLocalOrders();
+            const mergedRecent = apiOrders.length > 0 ? apiOrders : localFallbackOrders;
+            const totalRevenueCalc = data.metrics.totalRevenue || mergedRecent.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+            setMetrics({
+              totalOrders: Math.max(data.metrics.totalOrders || 0, mergedRecent.length),
+              totalRevenue: totalRevenueCalc,
+              totalCustomers: Math.max(data.metrics.totalCustomers || 0, new Set(mergedRecent.map(o => o.customer?.email)).size),
+              lowStockCount: data.metrics.lowStockCount || 0,
+            });
+            setRecentOrders(mergedRecent);
+          }
+        } catch (err) {
+          console.warn('Error fetching analytics dashboard metrics, trying local orders:', err.message);
         }
-      } catch (err) {
-        console.warn('Using fallback analytics dashboard metrics:', err.message);
+      }
+
+      if (!loadedFromApi) {
+        const localOrders = getLocalOrders();
+        setMetrics({
+          totalOrders: localOrders.length,
+          totalRevenue: localOrders.reduce((sum, o) => sum + o.totalAmount, 0),
+          totalCustomers: new Set(localOrders.map(o => o.customer?.email)).size,
+          lowStockCount: 0,
+        });
+        setRecentOrders(localOrders);
       }
     };
 
     fetchAnalytics();
-  }, [token]);
+  }, [token, API_URL]);
 
   const stats = [
     { label: "Total Orders", value: metrics.totalOrders.toLocaleString(), icon: <ShoppingBag /> },
@@ -210,19 +259,34 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-mono font-bold text-gray-900">#AHM-1002{i}</td>
-                      <td className="px-6 py-4 text-gray-700 font-medium">Customer {i}</td>
-                      <td className="px-6 py-4 text-gray-500 text-xs">Aug 20, 2026</td>
-                      <td className="px-6 py-4 text-gray-900 font-extrabold">₹{450 * i}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
-                          PENDING
-                        </span>
+                  {recentOrders.length > 0 ? (
+                    recentOrders.map((order) => (
+                      <tr key={order._id || order.orderNumber} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 font-mono font-bold text-gray-900">#{order.orderNumber}</td>
+                        <td className="px-6 py-4 text-gray-700 font-medium">{order.customer?.name || 'Customer'}</td>
+                        <td className="px-6 py-4 text-gray-500 text-xs">
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recent'}
+                        </td>
+                        <td className="px-6 py-4 text-gray-900 font-extrabold">₹{order.totalAmount}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${
+                            order.orderStatus === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                            order.orderStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                            order.orderStatus === 'PROCESSING' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                            'bg-gray-100 text-gray-800 border border-gray-200'
+                          }`}>
+                            {order.orderStatus || 'PENDING'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-8 text-center text-gray-500 text-sm">
+                        No orders placed yet.
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

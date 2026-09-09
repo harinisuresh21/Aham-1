@@ -16,50 +16,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const MOCK_ORDERS = [
-  {
-    _id: "ord-101",
-    orderNumber: "AHM-10021",
-    customer: { name: "Ananya Ramesh", email: "ananya@example.com", phone: "+91 9840123456" },
-    shippingAddress: { street: "45 Green Park", city: "Chennai", state: "Tamil Nadu", pincode: "600028" },
-    items: [{ name: "Aham Natural Turmeric Powder", sku: "AHM-TUR-250", price: 399, quantity: 2 }],
-    totalAmount: 798,
-    paymentMethod: "COD",
-    paymentStatus: "PENDING",
-    orderStatus: "PENDING",
-    createdAt: "2026-08-20T10:30:00.000Z",
-    fulfillment: { carrier: "", trackingNumber: "" },
-    adminNotes: [],
-  },
-  {
-    _id: "ord-102",
-    orderNumber: "AHM-10022",
-    customer: { name: "Karthik Subramanian", email: "karthik@example.com", phone: "+91 9444112233" },
-    shippingAddress: { street: "12 Anna Salai", city: "Coimbatore", state: "Tamil Nadu", pincode: "641001" },
-    items: [{ name: "Cold-Pressed Sesame Oil (Mara Chekku)", sku: "AHM-OIL-SES-500", price: 450, quantity: 1 }],
-    totalAmount: 450,
-    paymentMethod: "ONLINE",
-    paymentStatus: "PAID",
-    orderStatus: "PROCESSING",
-    createdAt: "2026-08-19T14:15:00.000Z",
-    fulfillment: { carrier: "Delhivery", trackingNumber: "AHM-DEL-8921" },
-    adminNotes: [{ note: "Call customer before delivery", adminName: "Super Admin", createdAt: "2026-08-19T15:00:00.000Z" }],
-  },
-  {
-    _id: "ord-103",
-    orderNumber: "AHM-10023",
-    customer: { name: "Priya Lakshmi", email: "priya@example.com", phone: "+91 9789012345" },
-    shippingAddress: { street: "78 Heritage Enclave", city: "Madurai", state: "Tamil Nadu", pincode: "625001" },
-    items: [{ name: "Raw Wild Forest Honey", sku: "AHM-HON-500", price: 650, quantity: 1 }],
-    totalAmount: 650,
-    paymentMethod: "UPI",
-    paymentStatus: "PAID",
-    orderStatus: "SHIPPED",
-    createdAt: "2026-08-18T09:00:00.000Z",
-    fulfillment: { carrier: "BlueDart", trackingNumber: "BD-99881122" },
-    adminNotes: [],
-  },
-];
+
 
 const OrderList = () => {
   const { token, admin, logout } = useAdminAuth();
@@ -80,33 +37,74 @@ const OrderList = () => {
       if (search) params.append('search', search);
       if (activeTab !== 'ALL') params.append('status', activeTab);
 
-      const res = await fetch(`http://localhost:5000/api/admin/orders?${params.toString()}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${API_URL}/api/admin/orders?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
 
-      if (res.ok && data.success && data.orders.length > 0) {
-        setOrders(data.orders);
-      } else {
-        // Fallback filter over mock orders
-        let filtered = [...MOCK_ORDERS];
-        if (search) {
-          filtered = filtered.filter(
-            (o) =>
-              o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-              o.customer.name.toLowerCase().includes(search.toLowerCase()) ||
-              o.customer.email.toLowerCase().includes(search.toLowerCase())
-          );
-        }
-        if (activeTab !== 'ALL') {
-          filtered = filtered.filter((o) => o.orderStatus === activeTab);
-        }
-        setOrders(filtered);
+      let fetchedOrders = [];
+      if (res.ok && data.success && Array.isArray(data.orders)) {
+        fetchedOrders = data.orders;
       }
+
+      if (fetchedOrders.length === 0) {
+        const localList = [];
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('aham_user_orders_')) {
+              const raw = localStorage.getItem(key);
+              if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) localList.push(...parsed);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Local orders read error:', e);
+        }
+        fetchedOrders = localList.map((o) => ({
+          _id: o.id || o.orderId,
+          orderNumber: o.orderId || o.id,
+          customer: { name: o.recipientName || 'Customer', email: o.recipientEmail || 'guest@example.com', phone: o.recipientPhone || 'N/A' },
+          createdAt: o.date ? new Date(o.date).toISOString() : new Date().toISOString(),
+          totalAmount: o.total || 0,
+          paymentMethod: o.paymentMethod || 'COD',
+          paymentStatus: o.paymentMethod === 'Cash on Delivery (COD)' ? 'PENDING' : 'PAID',
+          orderStatus: o.status || 'PROCESSING',
+          items: o.items || [],
+        }));
+      }
+
+      setOrders(fetchedOrders);
     } catch (err) {
-      console.warn('API error, using local orders catalog:', err.message);
-      setOrders(MOCK_ORDERS);
+      console.warn('API error fetching orders, reading local fallback:', err.message);
+      const localList = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('aham_user_orders_')) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) localList.push(...parsed);
+            }
+          }
+        }
+      } catch (e) {}
+      setOrders(localList.map((o) => ({
+        _id: o.id || o.orderId,
+        orderNumber: o.orderId || o.id,
+        customer: { name: o.recipientName || 'Customer', email: o.recipientEmail || 'guest@example.com', phone: o.recipientPhone || 'N/A' },
+        createdAt: o.date ? new Date(o.date).toISOString() : new Date().toISOString(),
+        totalAmount: o.total || 0,
+        paymentMethod: o.paymentMethod || 'COD',
+        paymentStatus: 'PENDING',
+        orderStatus: o.status || 'PROCESSING',
+        items: o.items || [],
+      })));
     } finally {
       setLoading(false);
     }

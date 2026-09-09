@@ -1,4 +1,5 @@
 import { Order } from '../models/Order.js';
+import { User } from '../models/User.js';
 import { recordAuditLog } from '../middleware/adminAuthMiddleware.js';
 
 /**
@@ -10,7 +11,18 @@ export const getAdminCustomers = async (req, res) => {
   try {
     const { search } = req.query;
 
-    // Aggregate customers from existing orders
+    // 1. Fetch registered users from User collection
+    const userQuery = { role: 'CUSTOMER' };
+    if (search) {
+      userQuery.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+      ];
+    }
+    const registeredUsers = await User.find(userQuery).lean();
+
+    // 2. Aggregate customer metrics from existing orders
     const pipeline = [
       {
         $group: {
@@ -39,7 +51,42 @@ export const getAdminCustomers = async (req, res) => {
       });
     }
 
-    const customers = await Order.aggregate(pipeline);
+    const orderCustomers = await Order.aggregate(pipeline);
+
+    // 3. Merge registered users & order customers
+    const customerMap = new Map();
+
+    registeredUsers.forEach((u) => {
+      customerMap.set(u.email.toLowerCase(), {
+        _id: u.email.toLowerCase(),
+        name: u.name,
+        email: u.email,
+        phone: u.phone || 'N/A',
+        ordersCount: 0,
+        totalSpent: 0,
+        lastOrderDate: u.createdAt,
+        registeredUser: true,
+      });
+    });
+
+    orderCustomers.forEach((oc) => {
+      const emailKey = oc.email ? oc.email.toLowerCase() : '';
+      if (emailKey) {
+        const existing = customerMap.get(emailKey) || {};
+        customerMap.set(emailKey, {
+          ...existing,
+          _id: emailKey,
+          name: oc.name || existing.name || 'Guest Customer',
+          email: oc.email || existing.email,
+          phone: oc.phone || existing.phone || 'N/A',
+          ordersCount: oc.ordersCount || 0,
+          totalSpent: oc.totalSpent || 0,
+          lastOrderDate: oc.lastOrderDate || existing.lastOrderDate,
+        });
+      }
+    });
+
+    const customers = Array.from(customerMap.values()).sort((a, b) => b.totalSpent - a.totalSpent);
 
     res.json({
       success: true,
